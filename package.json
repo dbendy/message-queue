@@ -15,9 +15,8 @@
     "extends": "standard"
   },
   "babel": {
-    "presets": ["es2015"],
-    "ignore": [
-      "**/*.spec.js"
+    "presets": [
+      "es2015"
     ]
   },
   "devDependencies": {
