@@ -1,12 +1,12 @@
 import express from 'express'
 import { json as parseJsonBody } from 'body-parser'
 import getConnection from './database'
-import getMessageModel, { UNPROCESSED, PENDING, PROCESSED } from './message'
-import config from '../config/default'
+import { pendingTimeout } from '../config/default'
+import MessageQueue from './Queue'
 
 const app = express()
 const db = getConnection()
-const Messages = getMessageModel(db)
+const mq = new MessageQueue({ db, pendingTimeout })
 
 // TODO: move these to a router in a different file
 
@@ -14,43 +14,15 @@ const Messages = getMessageModel(db)
 app.post('/message/new', parseJsonBody(), (req, res, next) => {
   const { payload } = req.body
 
-  Messages
-    .create({
-      payload,
-      status: UNPROCESSED
-    })
-    .then(({ id }) => res.json({ id }))
+  mq.addNewMessage(payload)
+    .then(id => res.json({ id }))
     .catch(err => next(err))
 })
 
 // request the next available message
 app.get('/message/next', (req, res, next) => {
-  let message = {}
-
-  Messages
-    .findAll({
-      where: { status: UNPROCESSED },
-      order: [['id', 'ASC']],
-      limit: 1
-    })
-    .then(result => {
-      if (result.length) {
-        message = result[0]
-        message.status = PENDING
-
-        return Messages
-          .update(
-            { status: PENDING },
-            { where: { id: message.id } }
-          )
-      }
-    })
-    .then(() => setTimeout(() =>
-      Messages.update(
-        { status: UNPROCESSED },
-        { where: { id: message.id } }
-      ), config.pendingTimeout))
-    .then(() => res.json(message))
+  mq.getNextMessage()
+    .then(message => res.json(message))
     .catch(err => next(err))
 })
 
@@ -58,33 +30,9 @@ app.get('/message/next', (req, res, next) => {
 app.post('/message/:id/status/done', (req, res, next) => {
   const { id: idFromUrl } = req.params
   const id = parseInt(idFromUrl)
-  let message
 
-  Messages
-    .findAll({
-      where: { id }
-    })
-    .then(result => {
-      if (!result.length) {
-        throw new Error(`message ${id} does not exist`)
-      }
-
-      message = result[0]
-
-      if (message.status !== PENDING) {
-        throw new Error(`error setting message ${id} to processed`)
-      }
-
-      message.status = PROCESSED
-    })
-    .then(() =>
-      Messages
-        .update(
-          { status: PROCESSED },
-          { where: { id } }
-        )
-    )
-    .then(() => res.json(message))
+  mq.setMessageAsProcessed(id)
+    .then(message => res.json(message))
     .catch(err => next(err))
 })
 
@@ -92,8 +40,7 @@ app.post('/message/:id/status/done', (req, res, next) => {
 // normally, I wouldn't create a view like this
 // but would use a proper templating library
 app.get('/info', (req, res, next) => {
-  Messages
-    .findAll()
+  mq.getQueueState()
     .then(messages => {
       const formatted = messages
         .map(({ id, payload, status }) =>
