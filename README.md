@@ -74,7 +74,7 @@ By default, this module uses `sqlite` in order to store messages in a persistant
 
 You can use a different database if you would like to as long as [`Sequelize`](http://docs.sequelizejs.com/) supports it.  In order to do so, you will have to install the necessary npm module for connecting to that database.  You can then supply all the configuration needed for connecting to that database to this server via environmental variables.  See [custom configuratin](#custom-configuration).
 
-## How this could scale for meeting high-volume demands
+## How this could scale to meet high-volume requests
 
 A few ideas:
 
@@ -84,9 +84,13 @@ If the bottleneck is accessing data from the database, one could:
 
 1. improve my proof-of-concept code to elminate some unecessary sql queries
 
-1. use a real database such as postgress as opposed to sqlite
+1. index the status column of my message table, which I don't think I ever did
 
-1. use a columnar database and index on the status column so that the database can select all the messages that need processing very quickly
+1. use a real database such as postgress as opposed to sqlite (this should be done regardless before serving any production traffic)
+
+1. apopt a policy of eviction from the messages table so that the select operation latency doesn't perpetually grow
+
+1. use a columnar database as it is optimized to run a SELECT ... WHERE on a large table
 
 1. create a caching layer within the code so that the unprocessed jobs are stored either directly in memory or in something like redis.  The inherent complexity there is figuring out how to keep the database and cache in sync
 
