@@ -16,8 +16,6 @@ In order to see the entire state of the queue, navigate to `/info` in a browser.
 ```
 $ yarn add http://github.com/dbendy/message-queue
 ```
-// TODO: publish tags of this repo to an npm registry such as npmjs.org so that this command can just be `yarn add message-queue`
-
 ## Local usage
 
 In order to start the message-queue server:
@@ -26,7 +24,7 @@ In order to start the message-queue server:
 $ message-queue
 ```
 
-You should be able to hit all the API routes mentioned in [Queue API](#queue-api) by using `http://localhost:3000` as the hostname. `
+You can use all the API routes mentioned in [Queue API](#queue-api) by using `http://localhost:3000` as the hostname.
 
 ## Producer and Consumer
 
@@ -62,7 +60,7 @@ consumer.getNextMessage()
   .catch(err => console.log(`something went wrong: ${err}`))
 
 consumer.notifyProcessed(7)
-  .then(() => console.log('we have successfully notified the queue that message 7 was processed'))
+  .then(success => console.log(success ? 'notification successful' : 'notification unsuccessful' ))
   .catch(err => console.log(`something went wrong: ${err}`)
 ```
 

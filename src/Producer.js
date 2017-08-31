@@ -15,5 +15,6 @@ export default class Producer {
 
   addNewMessage (payload) {
     return axios.post(this.url, { payload })
+      .then(({ data }) => data.id)
   }
 }

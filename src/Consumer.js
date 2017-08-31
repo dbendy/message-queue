@@ -15,10 +15,12 @@ export default class Consumer {
   getNextMessage () {
     const url = `${this.baseUrl}/message/next`
     return axios.get(url)
+      .then(({ data }) => data)
   }
 
   notifyProcessed (id) {
     const url = `${this.baseUrl}/message/${id}/status/done`
     return axios.post(url)
+      .then(({ data = {} }) => data.status === 'processed')
   }
 }
