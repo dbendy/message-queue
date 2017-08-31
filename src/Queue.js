@@ -18,6 +18,7 @@ export default class MessageQueue {
 
   getNextMessage () {
     let message = {}
+    let setTimeoutFn
 
     return this.messages
       .findAll({
@@ -29,6 +30,7 @@ export default class MessageQueue {
         if (result.length) {
           message = result[0]
           message.status = PENDING
+          setTimeoutFn = () => this._setPendingTimeout(message.id)
 
           return this.messages
             .update(
@@ -37,14 +39,30 @@ export default class MessageQueue {
             )
         }
       })
-      .then(() => setTimeout(() =>
-        // this should only change it back to UNPROCESSED if its still at PENDING
-        // TODO: should really only set this timeout when there was a found message
-        this.messages.update(
-          { status: UNPROCESSED },
-          { where: { id: message.id } }
-        ), this.pendingTimeout))
+      .then(() => setTimeoutFn())
       .then(() => message)
+  }
+
+  _setPendingTimeout (id) {
+    setTimeout(() => {
+      this.messages
+        .findAll({
+          where: {
+            id,
+            status: PENDING
+          }
+        })
+        .then(result => {
+          if (result.length) {
+            const { id } = result[0]
+
+            this.messages.update(
+              { status: UNPROCESSED },
+              { where: { id } }
+            )
+          }
+        })
+    }, this.pendingTimeout)
   }
 
   setMessageAsProcessed (id) {

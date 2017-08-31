@@ -5,10 +5,13 @@
   "repository": "git@github.com:dbendy/message-queue.git",
   "author": "Daniel Bendavid (dbendy@gmail.com)",
   "license": "MIT",
+  "bin": {
+    "message-queue": "dist/init.js"
+  },
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
-    "start": "nodemon dist/server.js",
+    "start": "nodemon dist/init.js",
     "lint": "eslint src",
     "test": "jest"
   },
@@ -18,9 +21,13 @@
   "babel": {
     "presets": [
       "es2015"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
     ]
   },
   "devDependencies": {
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "eslint": "^4.5.0",
     "eslint-config-standard": "^10.2.1",
@@ -32,7 +39,9 @@
     "nodemon": "^1.11.0"
   },
   "dependencies": {
+    "axios": "^0.16.2",
     "body-parser": "^1.17.2",
+    "config": "^1.26.2",
     "express": "^4.15.4",
     "sequelize": "^4.7.5",
     "sqlite3": "^3.1.9"

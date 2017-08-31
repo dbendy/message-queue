@@ -1,0 +1,11 @@
+{
+  "pendingTimeout": "PENDING_TIMEOUT",
+  "port": "PORT",
+  "db": {
+    "database": "DB_DATABASE",
+    "username": "DB_USERNAME",
+    "password": "DB_PASSWORD",
+    "dialect": "DB_DIALECT",
+    "storage": "DB_STORAGE"
+  }
+}
