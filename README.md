@@ -68,7 +68,7 @@ consumer.notifyProcessed(7)
 
 By default, this module uses `sqlite` in order to store messages in a persistant fashion.
 
-You can use a different database if you would like to as long as [`Sequelize`](http://docs.sequelizejs.com/) supports it.  In order to do so, you will have to install the necessary npm module for connecting to that database.  You can then supply all the configuration needed for connecting to that database to this server via environmental variables.  See [`custom-environmental-variables.json`]('./config/custom-environmental-variables.json') for a mapping of server configs to env vars.
+You can use a different database if you would like to as long as [`Sequelize`](http://docs.sequelizejs.com/) supports it.  In order to do so, you will have to install the necessary npm module for connecting to that database.  You can then supply all the configuration needed for connecting to that database to this server via environmental variables.  See [`custom-environmental-variables.json`]('https://github.com/dbendy/message-queue/blob/master/config/custom-environment-variables.json') for a mapping of server configs to env vars.
 
 ## How this could scale for meeting high-volume demands
 
