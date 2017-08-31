@@ -101,10 +101,25 @@ You can use a different database if you would like to as long as [`Sequelize'](h
 
 ## How this could scale for meeting high-volume demands
 
+A few ideas:
+
+Different strategies for meeting high-volume demands can be implemented depending on the bottleneck:
+
+If the bottleneck is accessing data from the database, one could:
+1. improve my proof-of-concept code to elminate some unecessary sql queries
+1. use a real database such as postgress as opposed to sqlite
+1. use a columnar database and index on the status column so that the database can select all the messages that need processing very quickly
+1. create a caching layer within the code so that the unprocessed jobs are stored either directly in memory or in something like redis.  The inherent complexity there is figuring out how to keep the database and cache in sync
+1. if we can drop the FIFO requirement, we could theoretically deply multiple instances of the message-queue server, each with their own database.  The producer and consumer could be modified so that they are aware of all the different servers and based on some algorithm choose which server they produce to and consume from.  In that case, there will need to be some separate server/process that queries all the individual servers in order to know the complete state of the queue to power the `/info` route.
+
+If the bottleneck is the server code itself:
+1. multiple instances of the server could be deployed, all behind a load-balancer, so that the request load could be handled.
+
 ## Remaining TODOs
 
 - move Producer and Consumer code out to their own repos.  They don't belong in the same repo as the server but just putting them here for now to reduce work
 - write unit tests for Queue
 - write tests using supertest for server
+
 
 
