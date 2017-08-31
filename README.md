@@ -26,6 +26,10 @@ $ message-queue
 
 You can use all the API routes mentioned in [Queue API](#queue-api) by using `http://localhost:3000` as the hostname.
 
+## Custom configuration
+
+The default configuration for the server can be found [here](config/default.json).  Any of those configs can be overridden via environment variables.  See this [map of configs to env vars](config/custom-environment-variables.json) to determine what you need to set in the environment.
+
 ## Producer and Consumer
 
 This repo contains a `Producer` and `Consumer` for interacting with the message-queue server.
@@ -68,7 +72,7 @@ consumer.notifyProcessed(7)
 
 By default, this module uses `sqlite` in order to store messages in a persistant fashion.
 
-You can use a different database if you would like to as long as [`Sequelize`](http://docs.sequelizejs.com/) supports it.  In order to do so, you will have to install the necessary npm module for connecting to that database.  You can then supply all the configuration needed for connecting to that database to this server via environmental variables.  See [`custom-environment-variables.json`](config/custom-environment-variables.json) for a mapping of server configs to env vars.
+You can use a different database if you would like to as long as [`Sequelize`](http://docs.sequelizejs.com/) supports it.  In order to do so, you will have to install the necessary npm module for connecting to that database.  You can then supply all the configuration needed for connecting to that database to this server via environmental variables.  See [custom configuratin](#custom-configuration).
 
 ## How this could scale for meeting high-volume demands
 
