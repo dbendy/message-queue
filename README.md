@@ -5,11 +5,11 @@
 This is a FIFO message queue.  It runs on a server (powered by `express`).  Producers and consumers can interact with the queue via HTTP requests.
 
 ## Queue API
-A producer can add a new message to queue by POSTING to `/message/new` with a `payload` field in the request body.
+A producer can add a new message to queue by POSTing to `/message/new` with a `payload` field in the request body.
 
-A consumer can make a GET request to `/message/next` to get the next message that needs to be processed.  At that point, that message is considered pending.  The consumer must notify the queue that the message has been processed by POSTing to `/message/:id/status/done`.  If that is not done within a certain amount of time (configureable), the message is placed back at the front of the queue.  If the consumer does POST to `/message/:id/status/done` before the timeout expires, the message is removed from the queue.
+A consumer can GET `/message/next` to retrieve the next message that needs to be processed.  At that point, that message is considered pending.  The consumer must notify the queue that the message has been processed by POSTing to `/message/:id/status/done`.  If that is not done within a certain amount of time (configureable), the message is placed back at the front of the queue and available for other consumers.  If the consumer does POST to `/message/:id/status/done` before the timeout expires, the message is removed from the queue.
 
-In order to see the entire state of the queue, make a GET request to `/info` in a browser.
+In order to see the entire state of the queue, navigate to `/info` in a browser.
 
 ## Installation
 
@@ -18,13 +18,15 @@ $ yarn add http://github.com/dbendy/message-queue
 ```
 // TODO: publish tags of this repo to an npm registry such as npmjs.org so that this command can just be `yarn add message-queue`
 
-## Starting the server
+## Local usage
 
 In order to start the message-queue server:
 
 ```
 $ message-queue
 ```
+
+You should be able to hit all the API routes mentioned in [Queue API](#queue-api) by using `http://localhost:3000` as the hostname. `
 
 ## Producer and Consumer
 
@@ -86,7 +88,7 @@ If the bottleneck is accessing data from the database, one could:
 
 1. create a caching layer within the code so that the unprocessed jobs are stored either directly in memory or in something like redis.  The inherent complexity there is figuring out how to keep the database and cache in sync
 
-1. if we can drop the FIFO requirement, we could theoretically deply multiple instances of the message-queue server, each with their own database.  The producer and consumer could be modified so that they are aware of all the different servers and based on some algorithm choose which server they produce to and consume from.  In that case, there will need to be some separate server/process that queries all the individual servers in order to know the complete state of the queue to power the `/info` route.
+1. if the FIFO requirement could be dropped, we could deply multiple instances of the message-queue server, each with their own database.  The producer and consumer could be modified so that they are aware of all the different servers and based on some algorithm choose which server they produce to and consume from.  In that case, there will need to be some separate server/process that queries all the individual servers in order to know the complete state of the queue to power the `/info` route.
 
 If the bottleneck is the server code itself:
 
